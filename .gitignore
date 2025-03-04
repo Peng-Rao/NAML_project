@@ -480,3 +480,9 @@ TSWLatexianTemp*
 
 # custom
 Data/
+
+# Tensorflow
+logs/
+model/
+model.h5
+*.keras

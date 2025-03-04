@@ -3,7 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[textwidth = 460pt,top = 80pt, bottom = 80pt]{geometry}
 \usepackage{graphicx}
-\usepackage[justification=default]{subfig} %Manage sub-figures 
+\usepackage[justification=default]{subfig} 
 \usepackage[update]{epstopdf}
 \usepackage[labelfont=bf]{caption}
 \usepackage[dvipsnames]{xcolor}
@@ -17,6 +17,9 @@
 \usepackage[intlimits]{empheq}
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,3d}
 
 
 %Bibliography
@@ -86,11 +89,22 @@ backend=biber]{biblatex}
 \section{Introduction} \label{sec:introduction}
 In today's fast-paced world, with millions of new songs released daily, organizing music into genres is essential for improving user experiences on streaming platforms and managing music libraries efficiently. However, manually classifying songs by genre is a time-consuming task. This is where \textbf{machine learning} offers a powerful solution.
 
+This project presents multiple \textbf{machine learning models} and \textbf{Convolutional Neural Networks} to classify music genres using audio files. The dataset used in this project is the \textbf{GTZAN dataset}, which contains 1000 audio tracks from 10 different genres. The models are trained on features extracted from the audio files, such as chroma features, MFCCs, and spectral features.
+
+The project is structured as follows:
+\begin{itemize}
+    \item \textbf{Data Exploration}: I explore the GTZAN dataset and visualize the audio features.
+    \item \textbf{Data Preprocessing}: I preprocess the data by normalizing the features and splitting the dataset into training and testing sets.
+    \item \textbf{Traditional Machine Learning Models}: I train several traditional machine learning models on the dataset and evaluate their performance.
+    \item \textbf{Convolutional Neural Network (CNN)}: I train a CNN model on the dataset and evaluate its performance.
+    \item \textbf{Conclusion}: I summarize the results of the project and discuss future work.
+\end{itemize}
+
 \section{Data Exploration} \label{sec:data_exploration}
 \subsection{Data Description}
 The \textbf{GTZAN dataset} is the most-used public dataset for evaluation in machine listening research for music genre recognition (MGR). The files were collected in 2000-2001 from a variety of sources including personal CDs, radio, microphone recordings, in order to represent a variety of recording conditions.\cite{GTZANDatasetMusic}
 
-The dataset consists of 1000 audio tracks each 30 seconds long. It contains 10 genres, each represented by 100 tracks. The tracks are all 22050Hz Mono 16-bit audio files in .wav format. The features of the dataset can be summarized as follows table \ref{tab:dataset}.
+The dataset consists of 1000 audio tracks each 30 seconds long. It contains 10 genres, each represented by 100 tracks. The tracks are all 22050Hz Mono 16-bit audio files in \textbf{.wav} format. The features of the dataset can be summarized as follows table \ref{tab:dataset}.
 \begin{table}[h]
     \centering
     \begin{tabular}{cccccc}
@@ -110,7 +124,7 @@ The dataset consists of 1000 audio tracks each 30 seconds long. It contains 10 g
 \end{table}
 
 \subsection{Waveform Analysis}
-The waveform of an audio signal is a representation of the amplitude of the sound wave as a function of time. I visualized the waveform of a sample track in figure \ref{fig:waveform}. The waveform figures show that some genres, like pop, metal, and hip-hop, exhibit high amplitude variations throughout the track. Others, like classical and jazz, show more varied amplitude patterns, reflecting their dynamic nature. Blues and reggae have distinct waveform structures that differentiate them from other genres.
+The \textbf{waveform} of an audio signal represents the amplitude of the sound wave over time. Figure \ref{fig:waveform} visualizes the waveform of a sample track. Genres such as pop, metal, and hip-hop exhibit significant amplitude variations throughout the track, indicating dynamic changes in loudness. In contrast, classical and jazz show more structured amplitude patterns, reflecting their dynamic nature. Blues and reggae have distinct waveform structures that set them apart from other genres.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/waveform.pdf}
@@ -119,7 +133,7 @@ The waveform of an audio signal is a representation of the amplitude of the soun
 \end{figure}
 
 \subsection{Chroma Analysis}
-Chroma features (or chroma vectors) are audio features used in music information retrieval to represent the harmonic and tonal content of an audio signal. They capture the distribution of energy across the 12 different pitch classes (e.g., C, C\#, D, D\#, ..., B) regardless of octave. I visualized the changes in chroma features over time for a sample track in figure \ref{fig:chroma}. Each row corresponds to one pitch class, showing how much energy is present in that pitch class over time. Genres like rock, blues, pop, and hip-hop show dense chroma activity, indicating frequent chord changes. Classical and jazz have more structured patterns (jazz is showing more harmonic complexity).
+\textbf{Chroma features} (or chroma vectors) are audio features used in music information retrieval to represent the harmonic and tonal content of an audio signal. They capture the distribution of energy across the 12 different pitch classes (e.g., C, C\#, D, D\#, ..., B) regardless of octave. Figure \ref{fig:chroma} visualizes the changes in chroma features over time for a sample track. Each row corresponds to one pitch class, showing the energy present in that pitch class over time. Genres like rock, blues, pop, and hip-hop exhibit dense chroma activity, indicating frequent chord changes. In contrast, classical and jazz display more structured patterns, with jazz showing greater harmonic complexity.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/chroma.pdf}
@@ -128,12 +142,21 @@ Chroma features (or chroma vectors) are audio features used in music information
 \end{figure}
 
 \subsection{MFCC Analysis}
-MFCC is a feature extraction technique commonly used in speech and audio processing. It transforms a raw audio signal into a compact, perceptually relevant representation by mimicking the human auditory system. Typically, the first 13-20 coefficients are used as features. I visualized the MFCCs of a sample track in figure \ref{fig:mfcc}. The MFCCs capture the timbral properties of the audio signal, showing how the spectral content changes over time. Genres like rock, blues, and pop exhibit high variability in MFCCs, reflecting their diverse timbral characteristics. Classical and jazz have more structured patterns, indicating more consistent timbral properties.
+MFCCs (\text{Mel-Frequency Cepstral Coefficients}) are widely used in audio and speech processing for feature extraction. They convert raw audio signals into a compact, perceptually meaningful representation by simulating the human auditory system. Typically, the first 13-20 coefficients are used as features. Figure \ref{fig:mfcc} visualizes the MFCCs of a sample track. These coefficients capture the timbral properties of the audio signal, illustrating how the spectral content evolves over time. Genres such as rock, blues, and pop show high variability in MFCCs, reflecting their diverse timbral characteristics. In contrast, classical and jazz exhibit more structured patterns, indicating consistent timbral properties.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/mfccs.pdf}
     \caption{MFCC13 of various sample audios track over time}
     \label{fig:mfcc}
+\end{figure}
+
+\subsection{Mel Spectrogram Analysis}
+A \textbf{Mel Spectrogram} is a visual representation of the frequency content of an audio signal over time, mapped to the Mel scale. It approximates the human ear's response to different frequencies, emphasizing lower frequencies (where humans are more sensitive) and compressing higher frequencies. Figure \ref{fig:spectrogram} visualizes the Mel spectrogram of sample tracks. The spectrogram captures the frequency content of the audio signal over time, showing how the energy is distributed across different frequency bands. Genres like rock, blues, and pop exhibit dense spectrogram activity, indicating a wide range of frequency components. In contrast, classical and jazz show more structured patterns, with jazz displaying greater frequency complexity.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/mel.pdf}
+    \caption{Mel Spectrogram of various sample audios track over time}
+    \label{fig:spectrogram}
 \end{figure}
 
 \subsection{Principal Component Analysis}
@@ -144,16 +167,18 @@ Principal Component Analysis (PCA) is a dimensionality reduction technique that 
     \caption{PCA of the GTZAN dataset}
     \label{fig:pca}
 \end{figure}
-b
+
+\pagebreak
+
 \section{Data Preprocessing} \label{sec:data_preprocessing}
 \subsection{Normalization}
-I normalized the dataset to ensure that all features have a similar scale. I used the Min-Max scaling technique to scale the features:
+I normalized the features of the dataset to ensure that all features have the same scale. Normalization is essential for machine learning models that rely on distance-based metrics to prevent features with larger scales from dominating the model. I used min-max scaling to normalize the features. The formula for min-max scaling is:
 \begin{equation}
     X_{\text{scaled}} = \frac{X - X_{\text{min}}}{X_{\text{max}} - X_{\text{min}}}
 \end{equation}
 
 \subsection{Train/Test Split} \label{sec:train_test_split}
-I split the dataset into training and testing sets using an 80/20 split. I used the training set to train the model and the testing set to evaluate its performance. The validation has been used during the training phase of the classifers to find good values of the hyperparameters.
+I split the dataset into training and testing sets using an \textbf{8/2} split. I used the training set to train the model and the testing set to evaluate its performance. The validation has been used during the training phase of the classifers to find good values of the hyperparameters.
 
 \subsection{Cross-Validation Split} \label{sec:cross_validation_split}
 I used a 5-fold cross-validation split to evaluate the model's performance. Cross-validation is a technique used to assess the model's generalization performance by training and testing the model on different subsets of the data, as shown in figure \ref{fig:cross_validation}.
@@ -164,6 +189,10 @@ I used a 5-fold cross-validation split to evaluate the model's performance. Cros
     \label{fig:cross_validation}
 \end{figure}
 
+\subsection{One-Hot Encoding}
+For CNN model, I used \textbf{one-hot encoding} to convert the target labels into a binary matrix. One-hot encoding is a technique used to convert categorical data into a binary matrix, where each column represents a unique category, and each row represents an instance. For example, the label 'rock' would be encoded as [0, 0, 0, 1, 0, 0, 0, 0, 0, 0] in a 10-class classification problem.
+
+\pagebreak
 \section{Traditional Machine Learning Models} \label{sec:traditional_ml}
 \subsection{Baseline Models}
 I trained several traditional machine learning models on the dataset to establish a baseline performance. The models I used are:
@@ -177,7 +206,7 @@ I trained several traditional machine learning models on the dataset to establis
 The models were trained using the default hyperparameters and evaluated using cross-validation. The results of training set are summarized in figure \ref{fig:baseline_models}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/baseline_models.pdf}
+    \includegraphics[width=0.9\textwidth]{graphics/baseline_models.jpg}
     \caption{Baseline Models Performance on training set}
     \label{fig:baseline_models}
 \end{figure}
@@ -210,8 +239,81 @@ The best hyperparameters found by RandomizedSearchCV were:
     \item \textbf{objective}: 'multi:softmax'
 \end{itemize}
 
+\pagebreak
 \section{Convolutional Neural Network (CNN)} \label{sec:cnn}
+Using deep learning, we can achieve the task of music genre classification without the need for hand-crafted features. In this study, the sound wave can be represented as a spectrogram, which in turn can be treated as an image.
+
+\subsection{Spectrogram Generation}
+A spectrogram is a 2D representation of a signal, having time on the x-axis, frequency on the y-axis. Each audio signal was converted into a MEL spectrogram. The parameters used to generate the power spectrogram using STFT are listed below:
+\begin{itemize}
+    \item \textbf{Window size}: 2048 samples
+    \item \textbf{Hop length}: 512 samples
+    \item \textbf{Sampling rate}: 22050 Hz
+\end{itemize}
+
+\subsection{Cost Function}
+The cost function used in this study is the categorical cross-entropy loss function, which is commonly used in multi-class classification problems. The categorical cross-entropy loss function is defined as:
+\begin{equation}
+    L(y, \hat{y}) = -\sum_{i} y_i \log(\hat{y}_i)
+\end{equation}
+where $y$ is the true label, $\hat{y}$ is the predicted label, and $i$ is the class index.
+
+\subsection{Model Architecture}
+Mel spectrograms can be considered as images and become the input to a CNN, which has good performance in images classification tasks. Each block in a CNN consists of the following layers:
+\begin{itemize}
+    \item \textbf{Convolutional 2D layer}: Extracts features from the input image using filters
+    \item \textbf{Max pooling layer}: Reduces the spatial dimensions of the feature map
+    \item \textbf{Dropout layer}: Regularizes the model to prevent overfitting
+\end{itemize}
+
+The architecture of the CNN model used in this study is shown in figure \ref{fig:cnn_architecture}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/model_architecture.jpg}
+    \caption{CNN Model Architecture}
+    \label{fig:cnn_architecture}
+\end{figure}
+
+\subsection{Model Training}
+The CNN model was trained using the training set and validated using the validation set. The model was trained for 50 epochs with a batch size of 32. The model was compiled using the \textbf{Adam optimizer}(with learning rate $=0.0001$) and the categorical cross-entropy loss function.
+
+% We get the loss curve and accuracy curve during the training phase, as shown in figure \ref{fig:loss_accuracy}.
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{graphics/loss_accuracy.pdf}
+%     \caption{Loss and Accuracy Curves during training}
+%     \label{fig:loss_accuracy}
+% \end{figure}
+
+\subsection{Model Evaluation}
+The CNN model was trained on the training set and evaluated on the testing set. The model achieved an accuracy of 0.85 on the testing set, outperforming the XGBoost model. The confusion matrix shows that the CNN model performs well for most genres, with high precision, recall, and F1-score. The model's performance is summarized in figure \ref{fig:cnn_evaluation}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/cnn_evaluation.pdf}
+    \caption{CNN Model Evaluation on testing set}
+    \label{fig:cnn_evaluation}
+\end{figure}
+
+
+
 \section{Conclusion} \label{sec:conclusion}
+In this study, I explored the GTZAN dataset, preprocessed the data, and trained both traditional machine learning models and a CNN model for music genre classification. The CNN model underperformed compared to traditional models because CNNs are optimized for spatial data, and when applied to extracted audio features that lack spatial relationships, they struggle. On the other hand, traditional models like SVC and XGBoost utilize manually extracted features (such as MFCC, Chroma, Spectral Contrast, Zero-Crossing Rate, etc.) that are specifically designed to capture audio patterns effectively. SVC and XGBoost classify based on these high-dimensional features efficiently and are less prone to overfitting.
+
+So, now by looking at the performance table, we can confidently say that SVM and KNN are the most suitable for this classification task. Show the performance table \ref{tab:performance}.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{cccc}
+        \toprule
+        \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} \\
+        \midrule
+        XGBoost        & 0.75              & 0.75               & 0.75            \\
+        CNN            & 0.85              & 0.85               & 0.85            \\
+        \bottomrule
+    \end{tabular}
+    \caption{Model Performance on testing set}
+    \label{tab:performance}
+\end{table}
 
 \clearpage
 \printbibliography[heading=bibintoc, title = {References}]
