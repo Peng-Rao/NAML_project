@@ -89,7 +89,7 @@ backend=biber]{biblatex}
 \section{Introduction} \label{sec:introduction}
 In today's fast-paced world, with millions of new songs released daily, organizing music into genres is essential for improving user experiences on streaming platforms and managing music libraries efficiently. However, manually classifying songs by genre is a time-consuming task. This is where \textbf{machine learning} offers a powerful solution.
 
-This project presents multiple \textbf{machine learning models} and \textbf{Convolutional Neural Networks} to classify music genres using audio files. The dataset used in this project is the \textbf{GTZAN dataset}, which contains 1000 audio tracks from 10 different genres. The models are trained on features extracted from the audio files, such as chroma features, MFCCs, and spectral features.
+This project presents multiple \textbf{machine learning models} and \textbf{Convolutional Neural Networks} to classify music genres using audio files. The dataset used in this project is the \textbf{GTZAN dataset}, which contains 1000 audio tracks from 10 different genres. The models are trained on features extracted from the audio files, such as \textbf{chroma features}, \textbf{MFCCs}, and \textbf{spectral features}.
 
 The project is structured as follows:
 \begin{itemize}
@@ -203,7 +203,7 @@ I trained several traditional machine learning models on the dataset to establis
     \item \textbf{Random Forest}
     \item \textbf{XGBoost}
 \end{itemize}
-The models were trained using the default hyperparameters and evaluated using cross-validation. The results of training set are summarized in figure \ref{fig:baseline_models}.
+The models were trained using the default hyperparameters and evaluated using 5-fold cross-validation. The results on the training set are summarized in figure \ref{fig:baseline_models}, with the x-axis representing accuracy. The \textbf{XGBoost} model outperformed the other models, achieving an accuracy of \textbf{0.91} on the training set.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/baseline_models.jpg}
@@ -212,7 +212,7 @@ The models were trained using the default hyperparameters and evaluated using cr
 \end{figure}
 
 \subsection{Model Evaluation}
-I evaluated the Xgboost model on the testing set and obtained an accuracy of 0.75. The confusion matrix shows that the model performs well for some genres (e.g., classical, jazz) but struggles with others (e.g., metal, hip-hop). The model's precision, recall, and F1-score are summarized in figure \ref{fig:xgboost_evaluation}.
+I evaluated the XGBoost model on the testing set and obtained an accuracy of \textbf{0.90}. The confusion matrix in figure \ref{fig:xgboost_evaluation} shows that the model performs well for some genres (e.g., classical, metal) but struggles with others (e.g., rock, country).
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/confusion_matrix.pdf}
@@ -221,30 +221,29 @@ I evaluated the Xgboost model on the testing set and obtained an accuracy of 0.7
 \end{figure}
 
 \subsection{Hyperparameter Tuning}
-I used RandomizedSearchCV to tune the hyperparameters of the XGBoost model. I performed a randomized search over a predefined hyperparameter grid and selected the best hyperparameters based on the model's performance. The hyperparameters I tuned were:
+I used \textbf{RandomizedSearchCV} to tune the hyperparameters of the XGBoost model. I performed a randomized search over a predefined hyperparameter grid and selected the best hyperparameters based on the model's performance. The hyperparameters I tuned were:
 \begin{itemize}
     \item \textbf{max\_depth}: Maximum depth of the tree
     \item \textbf{learning\_rate}: Step size shrinkage used in update to prevent overfitting
     \item \textbf{n\_estimators}: Number of boosting rounds
     \item \textbf{subsample}: Subsample ratio of the training instances
-    \item \textbf{colsample\_bytree}: Subsample ratio of columns when constructing each tree
+    \item \textbf{reg\_alpha}: L1 regularization term on weights
 \end{itemize}
 The best hyperparameters found by RandomizedSearchCV were:
 \begin{itemize}
-    \item \textbf{max\_depth}: 6
-    \item \textbf{learning\_rate}: 0.1
-    \item \textbf{n\_estimators}: 100
+    \item \textbf{max\_depth}: 5
+    \item \textbf{learning\_rate}: 0.2
+    \item \textbf{n\_estimators}: 500
     \item \textbf{subsample}: 0.8
-    \item \textbf{colsample\_bytree}: 0.8
-    \item \textbf{objective}: 'multi:softmax'
+    \item \textbf{reg\_alpha}: 0.1
 \end{itemize}
 
 \pagebreak
 \section{Convolutional Neural Network (CNN)} \label{sec:cnn}
-Using deep learning, we can achieve the task of music genre classification without the need for hand-crafted features. In this study, the sound wave can be represented as a spectrogram, which in turn can be treated as an image.
+Deep learning enables music genre classification without relying on manually crafted features. In this study, audio signals are transformed into spectrograms, which are then treated as images for classification.
 
 \subsection{Spectrogram Generation}
-A spectrogram is a 2D representation of a signal, having time on the x-axis, frequency on the y-axis. Each audio signal was converted into a MEL spectrogram. The parameters used to generate the power spectrogram using STFT are listed below:
+A \textbf{spectrogram} is a 2D representation of a signal, having time on the x-axis, \textbf{frequency} on the y-axis. Each audio signal was converted into a MEL spectrogram. The parameters used to generate the power spectrogram using STFT are listed below:
 \begin{itemize}
     \item \textbf{Window size}: 2048 samples
     \item \textbf{Hop length}: 512 samples
@@ -258,15 +257,24 @@ The cost function used in this study is the categorical cross-entropy loss funct
 \end{equation}
 where $y$ is the true label, $\hat{y}$ is the predicted label, and $i$ is the class index.
 
-\subsection{Model Architecture}
-Mel spectrograms can be considered as images and become the input to a CNN, which has good performance in images classification tasks. Each block in a CNN consists of the following layers:
+\subsection{Metrics}
+The model's performance was evaluated using the following metrics:
 \begin{itemize}
-    \item \textbf{Convolutional 2D layer}: Extracts features from the input image using filters
-    \item \textbf{Max pooling layer}: Reduces the spatial dimensions of the feature map
-    \item \textbf{Dropout layer}: Regularizes the model to prevent overfitting
+    \item \textbf{Accuracy}: The ratio of correctly classified instances to the total instances
+    \item \textbf{Precision}: The ratio of true positive instances to the total predicted positive instances
+    \item \textbf{Recall}: The ratio of true positive instances to the total actual positive instances
+    \item \textbf{F1-score}: The harmonic mean of precision and recall
 \end{itemize}
 
-The architecture of the CNN model used in this study is shown in figure \ref{fig:cnn_architecture}.
+\subsection{Model Architecture}
+\textbf{Mel spectrograms} can be treated as images and used as input to a CNN, which excels in image classification tasks. Each block in the CNN consists of the following layers:
+\begin{itemize}
+    \item \textbf{Convolutional 2D layer}: Extracts features from the input image using filters. Each filter slides over the image and performs a convolution operation, producing a feature map that highlights different aspects of the image, such as edges, textures, or patterns.
+    \item \textbf{Max pooling layer}: Reduces the spatial dimensions of the feature map by sliding a window over the feature map and taking the maximum value within the window. This operation helps in reducing the computational load and makes the features more robust to spatial variations.
+    \item \textbf{Dropout layer}: Regularizes the model to prevent overfitting by randomly setting a fraction of the input units to zero at each update during training. This encourages the model to learn more robust features.
+\end{itemize}
+
+The architecture of the CNN model \cite{ghildiyalMusicGenreClassification2020} used in this study is shown in figure \ref{fig:cnn_architecture}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/model_architecture.jpg}
@@ -277,17 +285,16 @@ The architecture of the CNN model used in this study is shown in figure \ref{fig
 \subsection{Model Training}
 The CNN model was trained using the training set and validated using the validation set. The model was trained for 50 epochs with a batch size of 32. The model was compiled using the \textbf{Adam optimizer}(with learning rate $=0.0001$) and the categorical cross-entropy loss function.
 
-% We get the loss curve and accuracy curve during the training phase, as shown in figure \ref{fig:loss_accuracy}.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.9\textwidth]{graphics/loss_accuracy.pdf}
-%     \caption{Loss and Accuracy Curves during training}
-%     \label{fig:loss_accuracy}
-% \end{figure}
+The training phase results are depicted in figure \ref{fig:loss_accuracy}, showing the loss and accuracy curves. The figure illustrates a decreasing loss and increasing accuracy over time, indicating effective learning. However, as the number of epochs increases, there is a risk of \textbf{overfitting}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/loss_accuracy.pdf}
+    \caption{Loss and Accuracy Curves during training}
+    \label{fig:loss_accuracy}
+\end{figure}
 
 \subsection{Model Evaluation}
-The CNN model was trained on the training set and evaluated on the testing set. The model achieved an accuracy of 0.85 on the testing set, outperforming the XGBoost model. The confusion matrix shows that the CNN model performs well for most genres, with high precision, recall, and F1-score. The model's performance is summarized in figure \ref{fig:cnn_evaluation}.
-
+The CNN model was trained on the training set and evaluated on the testing set. It achieved an accuracy of \textbf{0.87} on the testing set. The confusion matrix in figure \ref{fig:cnn_evaluation} indicates that the CNN model performs well for most genres. However, it encounters difficulties with genres like jazz and reggae, which exhibit similar spectral characteristics.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/cnn_evaluation.pdf}
@@ -295,20 +302,20 @@ The CNN model was trained on the training set and evaluated on the testing set. 
     \label{fig:cnn_evaluation}
 \end{figure}
 
-
-
 \section{Conclusion} \label{sec:conclusion}
 In this study, I explored the GTZAN dataset, preprocessed the data, and trained both traditional machine learning models and a CNN model for music genre classification. The CNN model underperformed compared to traditional models because CNNs are optimized for spatial data, and when applied to extracted audio features that lack spatial relationships, they struggle. On the other hand, traditional models like SVC and XGBoost utilize manually extracted features (such as MFCC, Chroma, Spectral Contrast, Zero-Crossing Rate, etc.) that are specifically designed to capture audio patterns effectively. SVC and XGBoost classify based on these high-dimensional features efficiently and are less prone to overfitting.
 
-So, now by looking at the performance table, we can confidently say that SVM and KNN are the most suitable for this classification task. Show the performance table \ref{tab:performance}.
+Based on the performance table \ref{tab:performance}, it is evident that \textbf{XGBoost} is the most suitable model for this classification task.
 \begin{table}[h]
     \centering
-    \begin{tabular}{cccc}
+    \begin{tabular}{ccccc}
         \toprule
-        \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} \\
+        \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1\-score} \\
         \midrule
-        XGBoost        & 0.75              & 0.75               & 0.75            \\
-        CNN            & 0.85              & 0.85               & 0.85            \\
+        SVC            & 0.85              & 0.85               & 0.85            & 0.85               \\
+        Random Forest  & 0.87              & 0.87               & 0.87            & 0.87               \\
+        CNN            & 0.87              & 0.87               & 0.87            & 0.87               \\
+        XGBoost        & 0.91              & 0.91               & 0.91            & 0.91               \\
         \bottomrule
     \end{tabular}
     \caption{Model Performance on testing set}
