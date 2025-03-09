@@ -215,10 +215,23 @@ The models were trained using the default hyperparameters and evaluated using 5-
 I evaluated the XGBoost model on the testing set and obtained an accuracy of \textbf{0.90}. The confusion matrix in figure \ref{fig:xgboost_evaluation} shows that the model performs well for some genres (e.g., classical, metal) but struggles with others (e.g., rock, country).
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/confusion_matrix.pdf}
+    \includegraphics[width=0.8\textwidth]{graphics/confusion_matrix.pdf}
     \caption{XGBoost Model Evaluation on testing set}
     \label{fig:xgboost_evaluation}
 \end{figure}
+
+To understand the importance of different features in the XGBoost model, I used the feature importance scores provided by the model. Feature importance scores indicate how valuable each feature is in constructing the boosted decision trees within the model. Figure \ref{fig:feature_importance} shows the feature importance scores for the top 10 features.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/feature_importance.pdf}
+    \caption{Feature Importance Scores for Top 10 Features}
+    \label{fig:feature_importance}
+\end{figure}
+
+The most important features are \textbf{perceptr} and \textbf{spectral\_bandwidth}, which capture the harmonic and spectral content of the audio signals, respectively. The two features might capture characteristics that are more prominent in classical and metal music.
+
 
 \subsection{Hyperparameter Tuning}
 I used \textbf{RandomizedSearchCV} to tune the hyperparameters of the XGBoost model. I performed a randomized search over a predefined hyperparameter grid and selected the best hyperparameters based on the model's performance. The hyperparameters I tuned were:
